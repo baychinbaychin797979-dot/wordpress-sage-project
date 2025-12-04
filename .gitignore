@@ -1,0 +1,8 @@
+/.env
+/wp/wp-content/uploads/
+/wp/wp-content/themes/sage/vendor/
+/wp/wp-content/themes/sage/node_modules/
+/db_data/
+.vscode/
+/.idea/
+*.log
