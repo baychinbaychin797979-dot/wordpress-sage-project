@@ -41,6 +41,11 @@ use App\Models\Team;
 use App\Models\Country;
 use App\Models\MatchModel;
 
+$liveCount = count_live_matches();
+$finishedCount = MatchModel::where('status_id', 8)->count();
+$scheduleCount = MatchModel::where('status_id', 1)->count();
+
+
 $statusLabels = [1=>'Not started',2=>'First half',3=>'Half-time',4=>'Second half',5=>'Overtime',6=>'Overtime(deprecated)',7=>'Penalty Shoot-out',8=>'End',9=>'Delay'];
 
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
@@ -105,23 +110,50 @@ return isset($scores[$idx]) && $scores[$idx] !== null ? (string)$scores[$idx] : 
         display: flex;
         gap: 8px;
         margin-bottom: 12px;
+        align-items: center;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 6px;
+        scrollbar-width: thin;
+    }
+
+    .tabs::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .tabs::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.08);
+        border-radius: 6px;
     }
 
     .tab {
+        flex: 0 0 auto;
         padding: 8px 14px;
-        background: white;
+        background: var(--card);
         border-radius: 5px;
-        border: 1px solid var(--border);
         text-decoration: none;
         color: var(--text);
         font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--border);
+        transition: all .18s ease;
+        white-space: nowrap;
+    }
+
+    .tab:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(15, 15, 15, 0.04);
     }
 
     .tab.active {
         background: var(--accent);
         color: white;
-        border-color: var(--accent);
+        border-color: rgba(0, 0, 0, 0.04);
+        box-shadow: 0 6px 18px rgba(211, 47, 47, 0.12);
     }
+
 
 
     .country {
@@ -276,6 +308,98 @@ return isset($scores[$idx]) && $scores[$idx] !== null ? (string)$scores[$idx] : 
             font-size: 14px;
         }
     }
+
+    .live-tab {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        /* color: #fff !important;
+        background: var(--accent); */
+    }
+
+    /* Badge LIVE nhấp nháy */
+    .live-badge {
+        background: #ff0000;
+        color: white;
+        font-size: 11px;
+        font-weight: 900;
+        padding: 4px 10px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+        animation: badgePulse 1.5s infinite;
+    }
+
+    /* Vòng tròn đỏ nhấp nháy */
+    .live-dot {
+        width: 18px;
+        height: 18px;
+
+        animation: liveBlink 1.3s infinite ease-in-out;
+    }
+
+    .tabs .active .live-dot {
+        filter: brightness(0) invert(1);
+    }
+
+    /* Hiệu ứng số lượng người đang xem */
+    .live-count-number {
+        animation: countFlicker 3s infinite;
+    }
+
+    /* Keyframes */
+    @keyframes liveBlink {
+        0% {
+
+            border-radius: 100%;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+        }
+
+        50% {
+
+            border-radius: 100%;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        100% {
+
+            border-radius: 100%;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+        }
+    }
+
+
+    @keyframes badgePulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+        }
+
+        50% {
+            box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 40px rgba(255, 50, 50, 0.8);
+        }
+    }
+
+    @keyframes countFlicker {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.7;
+        }
+    }
     </style>
 </head>
 
@@ -283,7 +407,17 @@ return isset($scores[$idx]) && $scores[$idx] !== null ? (string)$scores[$idx] : 
     <div class="container">
         <div class="tabs">
             <a class="tab <?php echo $filter==='all'?'active':'';?>" href="?filter=all">Tất cả</a>
-            <a class="tab <?php echo $filter==='live'?'active':'';?>" href="?filter=live">Trực tiếp</a>
+
+            <a class="tab live-tab <?php echo $filter==='live' ? 'active' : ''; ?>" href="?filter=live">
+
+                <img class="live-dot" src="<?php echo get_theme_file_uri('resources/images/live-i.png'); ?>" alt="Live"
+                    style="vertical-align:middle;">
+
+                </span>
+                Trực tiếp
+                <span class="cont-line">(<span class="live-count-number"><?php echo $liveCount; ?></span>)</span>
+            </a>
+
             <a class="tab <?php echo $filter==='finished'?'active':'';?>" href="?filter=finished">Đã kết thúc</a>
             <a class="tab <?php echo $filter==='schedule'?'active':'';?>" href="?filter=schedule">Lịch thi đấu</a>
         </div>

@@ -4,6 +4,9 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
 
+// Import Eloquent model (bắt buộc phải có)
+use App\Models\MatchModel;
+
 // Initialize Illuminate Database connection using WordPress DB credentials
 function setup_eloquent_connection() {
     global $wpdb;
@@ -28,4 +31,7 @@ function setup_eloquent_connection() {
     $capsule->bootEloquent();
 }
 
-// You can register theme features here if needed.
+// Hàm đếm trận trực tiếp
+function count_live_matches() {
+    return MatchModel::whereIn('status_id', [2,3,4,5,7])->count();
+}
