@@ -13,6 +13,8 @@ class MatchModel extends Model
     protected $casts = [
         'home_scores' => 'array',
         'away_scores' => 'array',
+        'status_id' => 'integer',
+        'match_time' => 'integer',
     ];
 
     public function home_team()
@@ -23,5 +25,30 @@ class MatchModel extends Model
     public function away_team()
     {
         return $this->belongsTo(Team::class, 'away_team_id', 'id');
+    }
+
+    // Accessors to guarantee scores are arrays of integers (or null where appropriate)
+    public function getHomeScoresAttribute($value)
+    {
+        $arr = is_array($value) ? $value : json_decode($value, true);
+        if (!is_array($arr)) return [];
+        return array_map(function ($v) {
+            if ($v === null) return null;
+            if ($v === "-1" || $v === -1) return -1;
+            if (is_numeric($v)) return (int)$v;
+            return null;
+        }, $arr);
+    }
+
+    public function getAwayScoresAttribute($value)
+    {
+        $arr = is_array($value) ? $value : json_decode($value, true);
+        if (!is_array($arr)) return [];
+        return array_map(function ($v) {
+            if ($v === null) return null;
+            if ($v === "-1" || $v === -1) return -1;
+            if (is_numeric($v)) return (int)$v;
+            return null;
+        }, $arr);
     }
 }
