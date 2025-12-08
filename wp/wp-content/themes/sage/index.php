@@ -221,7 +221,7 @@ return isset($scores[$idx]) && $scores[$idx] !== null ? (string)$scores[$idx] : 
     }
 
     .status-badge {
-        margin-top: 4px;
+        margin-top: 0px;
         font-size: 12px;
         padding: 2px 8px;
         border-radius: 12px;
