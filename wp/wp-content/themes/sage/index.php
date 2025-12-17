@@ -4,21 +4,7 @@ require_once __DIR__ . '/functions.php';
 
 if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
 ?>
-<!doctype html>
-<html>
 
-<head>
-    <meta charset="utf-8">
-    <title>Setup Required</title>
-</head>
-
-<body>
-    <h1>Theme setup required</h1>
-    <p>Please run <code>composer install</code> inside <code>wp/wp-content/themes/sage</code> and then run Acorn
-        migrations/seeders as described in README.</p>
-</body>
-
-</html>
 <?php
 return;
 }
